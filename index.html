@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arkanoid Móvil</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas {
+            background: #111;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.8;
+
+        // Variables del juego
+        const paddle = {
+            width: canvas.width * 0.3,
+            height: 15,
+            x: canvas.width / 2 - (canvas.width * 0.3) / 2,
+            y: canvas.height - 30,
+            color: "lime"
+        };
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: 10,
+            speedY: -10,
+            color: "red"
+        };
+
+        const words = ["Modelos", "Solución", "Decisiones", "Mejora", "Opciones", "Cognitivo", "Experiencia", "Creatividad", "Adaptación", "Limite", "Explorar", "IHC", "Fluir", "Pensar", "❤"];
+        const bricks = [];
+        const rows = 3;
+        const cols = 5;
+        const brickWidth = canvas.width / cols - 5;
+        const brickHeight = 40;
+
+        let wordIndex = 0;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                bricks.push({
+                    x: c * (brickWidth + 5),
+                    y: r * (brickHeight + 5) + 50,
+                    width: brickWidth,
+                    height: brickHeight,
+                    color: "purple",
+                    text: words[wordIndex % words.length],
+                    destroyed: false
+                });
+                wordIndex++;
+            }
+        }
+
+        function drawPaddle() {
+            ctx.shadowColor = "lime";
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = paddle.color;
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            ctx.shadowBlur = 0;
+        }
+
+        function drawBall() {
+            ctx.shadowColor = "red";
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = ball.color;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+            ctx.shadowBlur = 0;
+        }
+
+        function drawBricks() {
+            bricks.forEach(brick => {
+                if (!brick.destroyed) {
+                    ctx.shadowColor = "purple";
+                    ctx.shadowBlur = 15;
+                    ctx.strokeStyle = "purple";
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                    ctx.shadowBlur = 2;
+                    ctx.fillStyle = "purple";
+                    ctx.font = "16px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(brick.text, brick.x + brick.width / 2, brick.y + brick.height / 2 + 5);
+                }
+            });
+        }
+
+        function checkWin() {
+            if (bricks.every(brick => brick.destroyed)) {
+                setTimeout(() => {
+                    alert("¡Felicidades, ganaste!");
+                    document.location.reload();
+                }, 100);
+            }
+        }
+
+        function moveBall() {
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                ball.speedX *= -1;
+            }
+            if (ball.y - ball.radius < 0) {
+                ball.speedY *= -1;
+            }
+            if (ball.y + ball.radius > canvas.height) {
+                document.location.reload();
+            }
+
+            if (
+                ball.x > paddle.x &&
+                ball.x < paddle.x + paddle.width &&
+                ball.y + ball.radius > paddle.y
+            ) {
+                ball.speedY *= -1;
+            }
+
+            bricks.forEach(brick => {
+                if (!brick.destroyed) {
+                    if (
+                        ball.x > brick.x &&
+                        ball.x < brick.x + brick.width &&
+                        ball.y - ball.radius < brick.y + brick.height &&
+                        ball.y + ball.radius > brick.y
+                    ) {
+                        if (ball.x < brick.x + 5 || ball.x > brick.x + brick.width - 5) {
+                            ball.speedX *= -1;
+                        } else {
+                            ball.speedY *= -1;
+                        }
+                        brick.destroyed = true;
+                        checkWin();
+                    }
+                }
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle();
+            drawBall();
+            drawBricks();
+            moveBall();
+            requestAnimationFrame(draw);
+        }
+
+        canvas.addEventListener("touchmove", event => {
+            const touch = event.touches[0];
+            const touchX = touch.clientX;
+            paddle.x = touchX - paddle.width / 2;
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+        });
+
+        draw();
+    </script>
+</body>
+</html>
