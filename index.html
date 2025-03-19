@@ -71,32 +71,26 @@
 
         function drawPaddle() {
             ctx.shadowColor = "lime";
-            ctx.shadowBlur = 15;
             ctx.fillStyle = paddle.color;
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-            ctx.shadowBlur = 0;
         }
 
         function drawBall() {
             ctx.shadowColor = "red";
-            ctx.shadowBlur = 15;
             ctx.fillStyle = ball.color;
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
             ctx.fill();
             ctx.closePath();
-            ctx.shadowBlur = 0;
         }
 
         function drawBricks() {
             bricks.forEach(brick => {
                 if (!brick.destroyed) {
                     ctx.shadowColor = "purple";
-                    ctx.shadowBlur = 15;
                     ctx.strokeStyle = "purple";
                     ctx.lineWidth = 3;
                     ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
-                    ctx.shadowBlur = 2;
                     ctx.fillStyle = "purple";
                     ctx.font = "16px Arial";
                     ctx.textAlign = "center";
