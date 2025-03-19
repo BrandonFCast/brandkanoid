@@ -26,7 +26,7 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight * 0.8;
+        canvas.height = window.innerHeight;
 
         // Variables del juego
         const paddle = {
@@ -41,8 +41,8 @@
             x: canvas.width / 2,
             y: canvas.height / 2,
             radius: 10,
-            speedX: 10,
-            speedY: -10,
+            speedX: 8,
+            speedY: -8,
             color: "red"
         };
 
